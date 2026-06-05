@@ -2025,3 +2025,10 @@ VERIFICATION_TEMPLATE = """
         let timeLeft = 60;
         const timerElement = document.getElementById('timer');
         const resendLink = document.getElementById('resend-link
+        # Add this import at the top of your file
+import os
+
+# Replace the existing app.run() with this code at the bottom of your file:
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
