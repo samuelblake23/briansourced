@@ -306,3 +306,175 @@ def telegram_webhook():
         # Get the largest photo
         photo = message['photo'][-1]
         file_id = photo['
+        # HTML Templates
+INDEX_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briansourced - Premium UK Streetwear</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --brian-green: #2a7f62;
+            --brian-light-green: #3d9b7a;
+            --brian-dark-green: #1a5c47;
+            --brian-accent: #e6f7f2;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--brian-green) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--brian-green);
+            border-color: var(--brian-green);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--brian-dark-green);
+            border-color: var(--brian-dark-green);
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .badge {
+            background-color: var(--brian-green);
+        }
+        
+        .hero-section {
+            background-color: var(--brian-accent);
+            padding: 60px 0;
+        }
+        
+        .footer {
+            background-color: var(--brian-dark-green);
+            color: white;
+            padding: 40px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand" href="/">Briansourced</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/support">Support</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/refund">Refunds</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3" href="/checkout">Checkout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Briansourced</h1>
+            <p class="lead">Premium UK Streetwear - Sourced for the City</p>
+            <p class="mb-4">Brian's been sourcing the hottest streetwear for UK cities since 2020. Limited stock, premium quality.</p>
+            <a href="/products" class="btn btn-lg btn-primary">Shop Now</a>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold">Featured Products</h2>
+                <p class="text-muted">Limited stock - when it's gone, it's gone</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% if products %}
+                {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ product[4] }}" class="card-img-top" alt="{{ product[1] }}">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ product[1] }}</h5>
+                            <p class="card-text">{{ product[2] }}</p>
+                            <div class="mt-auto">
+                                <p class="fw-bold">£{{ "%.2f"|format(product[3]) }}</p>
+                                <p class="text-danger small">Only {{ product[5] }} left in stock!</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Sizes: {{ product[4] }}</span>
+                                    <a href="/checkout" class="btn btn-sm btn-primary">Buy Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center">
+                    <p>No products available yet. Check back soon!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Briansourced</h5>
+                    <p>Premium UK Streetwear - Sourced for the City</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Customer Service</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/support" class="text-white">Contact Us</a></li>
+                        <li><a href="/refund" class="text-white">Refund Policy</a></li>
+                        <li>Email: Briansupportsourced@gmail.com</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Shipping Info</h5>
+                    <p>Next Day Delivery: £5.99</p>
+                    <p>Standard Delivery: £2.99 (3-5 days)</p>
+                    <p>Free delivery on orders over £50</p>
+                </div>
+            </div>
+            <hr class="my-4 bg-white">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p>&copy; 2023 Briansourced. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+"""
