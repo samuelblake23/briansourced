@@ -1,6 +1,3 @@
-I'll rebuild the complete Flask application with all the necessary components integrated. This will be a single-file application with all the functionality from your previous code, but with errors fixed and properly structured.
-
-```python
 from flask import Flask, render_template, request, jsonify, redirect, url_for, render_template_string
 import sqlite3
 import requests
