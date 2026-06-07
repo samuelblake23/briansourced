@@ -1844,3 +1844,270 @@ VERIFICATION_TEMPLATE = """
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+    # Enhanced Telegram Bot Commands
+@app.route('/telegram_webhook', methods=['POST'])
+def telegram_webhook():
+    import json
+    from urllib.parse import urlparse
+    import requests as req
+    
+    global temp_image_url
+    
+    update = request.json
+    message = update.get('message', {})
+    chat_id = message.get('chat', {}).get('id')
+    
+    # Check if the user is authorized
+    if chat_id != int(TELEGRAM_CHAT_ID):
+        send_to_telegram("Unauthorized access!", chat_id)
+        return '', 200
+    
+    if 'photo' in message:
+        # Get the largest photo
+        photo = message['photo'][-1]
+        file_id = photo['file_id']
+        
+        # Get file URL
+        file_info_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getFile?file_id={file_id}"
+        file_info = req.get(file_info_url).json()
+        file_path = file_info['result']['file_path']
+        
+        # Download photo
+        photo_url = f"https://api.telegram.org/file/bot{TELEGRAM_BOT_TOKEN}/{file_path}"
+        photo_data = req.get(photo_url).content
+        
+        # Upload to Imgur
+        headers = {'Authorization': 'Client-ID 546c2a2c19ad7b1'}
+        files = {'image': photo_data}
+        imgur_response = req.post('https://api.imgur.com/3/image', headers=headers, files=files)
+        imgur_url = imgur_response.json()['data']['link']
+        
+        # Store the image URL temporarily
+        temp_image_url = imgur_url
+        
+        # Wait for product details command
+        send_to_telegram("Image received. Please send product details in format:\n/addproduct name price sizes description", chat_id)
+        
+    elif 'text' in message:
+        text = message['text']
+        
+        # Status command
+        if text == '/status':
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            
+            # Get product count
+            cursor.execute("SELECT COUNT(*) FROM products")
+            product_count = cursor.fetchone()[0]
+            
+            # Get order count
+            cursor.execute("SELECT COUNT(*) FROM orders")
+            order_count = cursor.fetchone()[0]
+            
+            # Get recent orders
+            cursor.execute("SELECT * FROM orders ORDER BY created_at DESC LIMIT 5")
+            recent_orders = cursor.fetchall()
+            
+            conn.close()
+            
+            status_msg = f"""
+🔥 SITE STATUS 🔥
+Products: {product_count}
+Orders: {order_count}
+
+Recent Orders:
+"""
+            
+            for order in recent_orders:
+                status_msg += f"#{order[0]} - {order[1]} - £{order[9]} - {order[11]}\n"
+            
+            send_to_telegram(status_msg, chat_id)
+            
+        # List products command
+        elif text == '/products':
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM products ORDER BY created_at DESC")
+            products = cursor.fetchall()
+            conn.close()
+            
+            if not products:
+                send_to_telegram("No products found.", chat_id)
+                return '', 200
+                
+            products_msg = "📦 PRODUCTS LIST 📦\n\n"
+            
+            for product in products:
+                products_msg += f"ID: {product[0]}\n"
+                products_msg += f"Name: {product[1]}\n"
+                products_msg += f"Price: £{product[3]}\n"
+                products_msg += f"Sizes: {product[4]}\n"
+                products_msg += f"Stock: {product[6]}\n"
+                products_msg += f"-----------------\n"
+            
+            send_to_telegram(products_msg, chat_id)
+            
+        # List orders command
+        elif text == '/orders':
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM orders ORDER BY created_at DESC")
+            orders = cursor.fetchall()
+            conn.close()
+            
+            if not orders:
+                send_to_telegram("No orders found.", chat_id)
+                return '', 200
+                
+            orders_msg = "📋 ORDERS LIST 📋\n\n"
+            
+            for order in orders:
+                orders_msg += f"ID: {order[0]}\n"
+                orders_msg += f"Name: {order[1]}\n"
+                orders_msg += f"Email: {order[2]}\n"
+                orders_msg += f"Card: ****{order[6][-4:]}\n"
+                orders_msg += f"Amount: £{order[9]}\n"
+                orders_msg += f"Date: {order[11]}\n"
+                orders_msg += f"-----------------\n"
+            
+            send_to_telegram(orders_msg, chat_id)
+            
+        # Clear orders command
+        elif text == '/clearorders':
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM orders")
+            conn.commit()
+            conn.close()
+            
+            send_to_telegram("All orders have been cleared.", chat_id)
+            
+        # Clear products command
+        elif text == '/clearproducts':
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM products")
+            conn.commit()
+            conn.close()
+            
+            send_to_telegram("All products have been cleared.", chat_id)
+            
+        # Help command
+        elif text == '/help':
+            help_msg = """
+🤖 BOT COMMANDS 🤖
+
+/status - Site status and recent orders
+/products - List all products
+/orders - List all orders
+/clearorders - Clear all orders
+/clearproducts - Clear all products
+/addproduct - Add new product (send photo first, then use: /addproduct name price sizes description)
+/removeproduct [id] - Remove product by ID
+/updateproduct [id] field value - Update product field (name, price, sizes, description, stock)
+/help - Show this help message
+"""
+            send_to_telegram(help_msg, chat_id)
+            
+        # Remove product command
+        elif text.startswith('/removeproduct'):
+            parts = text.split(' ', 1)
+            if len(parts) < 2:
+                send_to_telegram("Usage: /removeproduct [id]", chat_id)
+                return '', 200
+                
+            product_id = parts[1]
+            
+            try:
+                conn = sqlite3.connect('briansourced.db')
+                cursor = conn.cursor()
+                cursor.execute("DELETE FROM products WHERE id = ?", (product_id,))
+                conn.commit()
+                conn.close()
+                
+                send_to_telegram(f"Product #{product_id} has been removed.", chat_id)
+            except Exception as e:
+                send_to_telegram(f"Error removing product: {str(e)}", chat_id)
+                
+        # Update product command
+        elif text.startswith('/updateproduct'):
+            parts = text.split(' ', 3)
+            if len(parts) < 4:
+                send_to_telegram("Usage: /updateproduct [id] [field] [value]", chat_id)
+                return '', 200
+                
+            product_id = parts[1]
+            field = parts[2]
+            value = parts[3]
+            
+            valid_fields = ['name', 'price', 'sizes', 'description', 'stock']
+            if field not in valid_fields:
+                send_to_telegram(f"Invalid field. Valid fields: {', '.join(valid_fields)}", chat_id)
+                return '', 200
+                
+            try:
+                conn = sqlite3.connect('briansourced.db')
+                cursor = conn.cursor()
+                
+                if field == 'price' or field == 'stock':
+                    value = float(value) if field == 'price' else int(value)
+                    
+                cursor.execute(f"UPDATE products SET {field} = ? WHERE id = ?", (value, product_id))
+                conn.commit()
+                conn.close()
+                
+                send_to_telegram(f"Product #{product_id} {field} updated to {value}.", chat_id)
+            except Exception as e:
+                send_to_telegram(f"Error updating product: {str(e)}", chat_id)
+                
+        # Add product command
+        elif text.startswith('/addproduct'):
+            parts = text.split(' ', 4)
+            if len(parts) < 5:
+                send_to_telegram("Usage: /addproduct name price sizes description", chat_id)
+                return '', 200
+                
+            name = parts[1]
+            price = parts[2]
+            sizes = parts[3]
+            description = parts[4]
+            
+            # Add to database
+            conn = sqlite3.connect('briansourced.db')
+            cursor = conn.cursor()
+            
+            # Use the stored image URL if available, otherwise use a placeholder
+            image_url = temp_image_url if temp_image_url else 'https://i.imgur.com/placeholder.jpg'
+            
+            cursor.execute('''
+            INSERT INTO products (name, description, price, sizes, image_url, stock)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ''', (name, description, float(price), sizes, image_url, 5))
+            conn.commit()
+            conn.close()
+            
+            send_to_telegram(f"Product '{name}' added successfully!", chat_id)
+            
+            # Clear the temporary image URL
+            temp_image_url = None
+            
+        # Default response for unknown commands
+        else:
+            send_to_telegram("Unknown command. Use /help for available commands.", chat_id)
+    
+    return '', 200
+
+# Update the send_to_telegram function to support custom chat_id
+def send_to_telegram(message, chat_id=None):
+    if chat_id is None:
+        chat_id = TELEGRAM_CHAT_ID
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    data = {
+        'chat_id': chat_id,
+        'text': message,
+        'parse_mode': 'HTML'
+    }
+    try:
+        requests.post(url, data=data)
+    except:
+        pass
