@@ -322,7 +322,7 @@ def telegram_webhook():
         photo_data = req.get(photo_url).content
         
         # Upload to Imgur
-      headers = {'Authorization': 'Client-ID 546c2a2c19ad7b1'}
+                  headers = {'Authorization': 'Client-ID 546c2a2c19ad7b1'}
         files = {'image': photo_data}
         imgur_response = req.post('https://api.imgur.com/3/image', headers=headers, files=files)
         imgur_url = imgur_response.json()['data']['link']
