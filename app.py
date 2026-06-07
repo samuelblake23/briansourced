@@ -1839,3 +1839,8 @@ VERIFICATION_TEMPLATE = """
                         <div class="input-group">
                             <span class="input-group-text"><i class="far fa-credit-card"></i></span>
                             <input type="text" class="form-control" id="cardNumber" placeholder="
+                            """
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
